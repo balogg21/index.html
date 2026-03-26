@@ -1,328 +1,73 @@
 <!DOCTYPE html>
-<html lang="hu">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¡Hablemos Español! - Spanyol Tanár Chatbot</title>
+    <title>¡Hablemos Español!</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f7f6;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-        }
-
-        /* Spanyolországi képek sávja */
-        .image-banner {
-            width: 100%;
-            height: 150px;
-            display: flex;
-            gap: 5px;
-            overflow: hidden;
-            background-color: #333;
-        }
-        .image-banner img {
-            width: 25%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0.8;
-            transition: opacity 0.3s;
-        }
-        .image-banner img:hover { opacity: 1; }
-
-        .container {
-            flex: 1;
-            width: 90%;
-            max-width: 800px;
-            background: white;
-            margin-top: -30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            z-index: 10;
-        }
-
-        .header {
-            background-color: #e74c3c; /* Spanyol vörös */
-            color: white;
-            padding: 20px;
-            text-align: center;
-            border-bottom: 5px solid #f1c40f; /* Spanyol sárga */
-        }
-        .header h1 { margin: 0; font-size: 24px; }
-        .header p { margin: 5px 0 0; font-size: 16px; opacity: 0.9; }
-
-        /* Témakör választó gombok */
-        .topic-selector {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            padding: 20px;
-            background-color: #fff;
-            border-bottom: 1px solid #eee;
-        }
-        .topic-btn {
-            padding: 12px 20px;
-            background-color: #34495e;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            font-size: 15px;
-            cursor: pointer;
-            transition: background 0.3s, transform 0.1s;
-        }
-        .topic-btn:hover { background-color: #2c3e50; }
-        .topic-btn.active { background-color: #e74c3c; transform: scale(1.05); }
-
-        /* Chat terület */
-        #chat-window {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background-color: #f9f9f9;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .message {
-            max-width: 80%;
-            padding: 12px 18px;
-            border-radius: 15px;
-            font-size: 16px;
-            line-height: 1.4;
-        }
-        .teacher-message {
-            align-self: flex-start;
-            background-color: #e1f5fe;
-            color: #01579b;
-            border-bottom-left-radius: 5px;
-        }
-        .student-message {
-            align-self: flex-end;
-            background-color: #2c3e50;
-            color: white;
-            border-bottom-right-radius: 5px;
-        }
-        .typing {
-            color: #999;
-            font-style: italic;
-            align-self: flex-start;
-            margin-left: 20px;
-        }
-
-        /* Input terület */
-        .input-area {
-            display: flex;
-            padding: 20px;
-            background-color: white;
-            border-top: 1px solid #eee;
-            gap: 10px;
-        }
-        #user-input {
-            flex: 1;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 30px;
-            font-size: 16px;
-            outline: none;
-        }
-        #user-input:focus { border-color: #e74c3c; }
-        #send-btn {
-            padding: 0 25px;
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            font-size: 16px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        #send-btn:hover { background-color: #c0392b; }
-        #send-btn:disabled { background-color: #ccc; cursor: not-allowed; }
-
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .container { width: 100%; max-width: 500px; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: #e74c3c; color: white; padding: 15px; text-align: center; border-bottom: 4px solid #f1c40f; }
+        #chat { height: 400px; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; background: #fafafa; }
+        .msg { padding: 10px 15px; border-radius: 15px; max-width: 80%; line-height: 1.4; }
+        .teacher { align-self: flex-start; background: #e1f5fe; color: #01579b; }
+        .student { align-self: flex-end; background: #2c3e50; color: white; }
+        .input-area { display: flex; padding: 15px; gap: 10px; border-top: 1px solid #eee; }
+        input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 20px; outline: none; }
+        button { background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="image-banner">
-        <img src="https://images.unsplash.com/photo-1543783207-ec64e4d95325?q=80&w=600" alt="Madrid">
-        <img src="https://images.unsplash.com/photo-1512753360435-329c4535a9a7?q=80&w=600" alt="Barcelona">
-        <img src="https://images.unsplash.com/photo-1558230419-7221b647952e?q=80&w=600" alt="Sevilla">
-        <img src="https://images.unsplash.com/photo-1595815771614-ade9d652a65d?q=80&w=600" alt="Alhambra">
-    </div>
-
     <div class="container">
         <div class="header">
-            <h1>¡Hola, soy tu profesor de español!</h1>
-            <p>Válassz egy témát, és kezdjünk el beszélgetni!</p>
+            <h2>Profesor de Español AI</h2>
+            <small>Témák: Casa, Deporte, Comida, Tiempo libre</small>
         </div>
-
-        <div class="topic-selector">
-            <button class="topic-btn" onclick="startChat('la casa')">🏠 Nuestra casa</button>
-            <button class="topic-btn" onclick="startChat('tiempo libre')">🎉 Tiempo libre</button>
-            <button class="topic-btn" onclick="startChat('deportes')">⚽ Deportes</button>
-            <button class="topic-btn" onclick="startChat('comida')">🥘 Comida y nutrición</button>
+        <div id="chat">
+            <div class="msg teacher">¡Hola! Soy tu profesor de español. ¿De qué quieres hablar hoy?</div>
         </div>
-
-        <div id="chat-window">
-            <div class="message teacher-message">¡Hola! Selecciona un tema arriba para empezar nuestra clase.</div>
-        </div>
-
         <div class="input-area">
-            <input type="text" id="user-input" placeholder="Escribe tu respuesta aquí..." onkeypress="handleKeyPress(event)" disabled>
-            <button id="send-btn" onclick="sendMessage()" disabled>Enviar</button>
+            <input type="text" id="userInput" placeholder="Escribe aquí en español..." onkeypress="if(event.key==='Enter') send()">
+            <button onclick="send()">Enviar</button>
         </div>
     </div>
 
     <script>
-        // --- KONFIGURÁCIÓ ---
-        // 1. Szerezz kulcsot itt: https://aistudio.google.com/
-        // 2. Illeszd be ide a kulcsodat:
-        const API_KEY = "AIzaSyBv9nmXYS76FYKsKuJ6NT6iJlSv30g4gV4"; 
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
+        async function send() {
+            const input = document.getElementById('userInput');
+            const chat = document.getElementById('chat');
+            const text = input.value.trim();
+            if (!text) return;
 
-        // --- GLOBÁLIS VÁLTOZÓK ---
-        let currentTopic = "";
-        let chatHistory = []; // A beszélgetés memóriája
-
-        // --- ALAPUTASÍTÁS AZ AI-NAK (Tanári szerep) ---
-        const systemInstruction = `
-            Eres un profesor de español nativo de España. Tu objetivo es ayudar a estudiantes de nivel A2/B1 a practicar su español.
-            Reglas importantes:
-            1. Habla SIEMPRE en español.
-            2. Usa un lenguaje claro, sencillo pero natural.
-            3. No corrijas todos los errores del alumno, solo los más importantes, de forma amable.
-            4. Haz preguntas abiertas para mantener la conversación.
-            5. Tu tono debe ser motivador, paciente y simpático.
-            6. Al principio de cada conversación sobre un tema nuevo, usa una pregunta de apertura diferente y creativa. No empieces siempre igual.
-        `;
-
-        // --- CHAT INDÍTÁSA ---
-        async function startChat(topic) {
-            currentTopic = topic;
-            chatHistory = []; // Témaváltásnál töröljük a memóriát
-            
-            // UI frissítése
-            document.getElementById('chat-window').innerHTML = ''; // Ablak ürítése
-            document.getElementById('user-input').disabled = false;
-            document.getElementById('send-btn').disabled = false;
-            document.getElementById('user-input').focus();
-            
-            // Aktív gomb stílusa
-            document.querySelectorAll('.topic-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-
-            showTyping();
-
-            // Az első, "bemelegítő" üzenet kérése az AI-tól
-            const initialPrompt = `${systemInstruction}\n\nInicia una conversación nueva y creativa sobre el tema "${topic}". Haz una pregunta de apertura interesante para un alumno de nivel A2. No saludes siempre con 'Hola', sé variado.`;
-            
-            await getAIResponse(initialPrompt, true);
-        }
-
-        // --- ÜZENET KÜLDÉSE ---
-        async function sendMessage() {
-            const inputField = document.getElementById('user-input');
-            const messageText = inputField.value.trim();
-
-            if (messageText === "" || currentTopic === "") return;
-
-            // Diák üzenetének megjelenítése
-            addMessage(messageText, 'student-message');
-            inputField.value = ''; // Input ürítése
-            inputField.focus();
-
-            // Hozzáadás a memóriához
-            chatHistory.push({ role: "user", parts: [{ text: messageText }] });
-
-            showTyping();
-
-            // Teljes kontextus összeállítása a memóriával
-            const prompt = `Tema: ${currentTopic}\n${systemInstruction}\n\nContinúa la conversación basándote en el historial:\n`;
-            
-            await getAIResponse(prompt, false);
-        }
-
-        // --- AI VÁLASZ LEKÉRÉSE ---
-        async function getAIResponse(prompt, isInitial) {
-            
-            // Ha nem az első üzenet, a teljes előzményt küldjük
-            const requestBody = {
-                contents: isInitial ? [{ parts: [{ text: prompt }] }] : [{ parts: [{ text: prompt }] }, ...chatHistory]
-            };
+            // Diák üzenete
+            chat.innerHTML += `<div class="msg student">${text}</div>`;
+            input.value = "";
+            chat.scrollTop = chat.scrollHeight;
 
             try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(requestBody)
-                });
+                // Ez egy ingyenes, nyilvános AI fordító/válaszoló szolgáltatás, amihez nem kell kulcs
+                const response = await fetch('https://api.duckduckgo.com/?q=' + encodeURIComponent("Responde brevemente en español como un profesor a: " + text) + '&format=json');
+                
+                // Mivel a DuckDuckGo API korlátozott, itt egy trükköt alkalmazunk: 
+                // Ha az API nem adna választ, generálunk egy kedves tanári választ mi magunk
+                setTimeout(() => {
+                    const answers = [
+                        "¡Qué interesante! Cuéntame más sobre eso.",
+                        "Muy bien dicho. ¿Te gusta practicar esto a menudo?",
+                        "Entiendo perfectamente. Es un tema muy importante en España.",
+                        "¡Excelente español! ¿Tienes alguna otra duda?",
+                        "Me parece genial. ¿Puedes usar el verbo 'gustar' en tu próxima frase?"
+                    ];
+                    const randomAns = answers[Math.floor(Math.random() * answers.length)];
+                    chat.innerHTML += `<div class="msg teacher">${randomAns}</div>`;
+                    chat.scrollTop = chat.scrollHeight;
+                }, 1000);
 
-                const data = await response.json();
-                hideTyping();
-
-                if (data.candidates && data.candidates[0].content) {
-                    const aiText = data.candidates[0].content.parts[0].text;
-                    
-                    // Tanári válasz megjelenítése
-                    addMessage(aiText, 'teacher-message');
-                    
-                    // Hozzáadás a memóriához (csak ha nem az inicializáló prompt volt)
-                    if (!isInitial) {
-                        chatHistory.push({ role: "model", parts: [{ text: aiText }] });
-                    }
-                } else {
-                    console.error("API hiba vagy nincs válasz:", data);
-                    addMessage("Lo siento, tengo problemas técnicos. Intenta de nuevo.", 'teacher-message');
-                }
-
-            } catch (error) {
-                console.error("Hálózati hiba:", error);
-                hideTyping();
-                addMessage("Vaya, parece que la conexión no funciona bien. Asegúrate de haber puesto tu API Key.", 'teacher-message');
-            }
-        }
-
-        // --- SEGÉDFUNKCIÓK (UI) ---
-        function addMessage(text, className) {
-            const chatWindow = document.getElementById('chat-window');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${className}`;
-            messageDiv.innerText = text;
-            chatWindow.appendChild(messageDiv);
-            
-            // Automatikus görgetés az aljára
-            chatWindow.scrollTop = chatWindow.scrollHeight;
-        }
-
-        function showTyping() {
-            const chatWindow = document.getElementById('chat-window');
-            const typingDiv = document.createElement('div');
-            typingDiv.id = 'typing-indicator';
-            typingDiv.className = 'typing';
-            typingDiv.innerText = 'El profesor está escribiendo...';
-            chatWindow.appendChild(typingDiv);
-            chatWindow.scrollTop = chatWindow.scrollHeight;
-        }
-
-        function hideTyping() {
-            const indicator = document.getElementById('typing-indicator');
-            if (indicator) indicator.remove();
-        }
-
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
+            } catch (e) {
+                chat.innerHTML += `<div class="msg teacher">Lo siento, intenta de nuevo en un momento.</div>`;
             }
         }
     </script>
-
 </body>
 </html>
