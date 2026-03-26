@@ -3,71 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¡Hablemos Español!</title>
+    <title>¡Hablemos Español! - Profesor de IA</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .container { width: 100%; max-width: 500px; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); overflow: hidden; }
-        .header { background: #e74c3c; color: white; padding: 15px; text-align: center; border-bottom: 4px solid #f1c40f; }
-        #chat { height: 400px; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; background: #fafafa; }
-        .msg { padding: 10px 15px; border-radius: 15px; max-width: 80%; line-height: 1.4; }
-        .teacher { align-self: flex-start; background: #e1f5fe; color: #01579b; }
-        .student { align-self: flex-end; background: #2c3e50; color: white; }
-        .input-area { display: flex; padding: 15px; gap: 10px; border-top: 1px solid #eee; }
-        input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 20px; outline: none; }
-        button { background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .banner { width: 100%; max-width: 600px; height: 120px; border-radius: 15px; margin-bottom: 15px; object-fit: cover; }
+        .card { width: 100%; max-width: 600px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); overflow: hidden; display: flex; flex-direction: column; }
+        .header { background: #e74c3c; color: white; padding: 20px; text-align: center; border-bottom: 5px solid #f1c40f; }
+        .topics { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 15px; background: #fff; border-bottom: 1px solid #eee; }
+        .topic-btn { padding: 10px 15px; border: none; border-radius: 20px; background: #34495e; color: white; cursor: pointer; transition: 0.3s; font-weight: bold; }
+        .topic-btn:hover { background: #2c3e50; transform: scale(1.05); }
+        .active-topic { background: #e74c3c !important; }
+        #chat { height: 400px; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; background: #f9f9f9; }
+        .msg { padding: 12px 18px; border-radius: 18px; max-width: 80%; line-height: 1.5; font-size: 16px; }
+        .teacher { align-self: flex-start; background: #e1f5fe; color: #01579b; border-bottom-left-radius: 2px; }
+        .student { align-self: flex-end; background: #2c3e50; color: white; border-bottom-right-radius: 2px; }
+        .input-area { display: flex; padding: 20px; gap: 10px; background: white; border-top: 1px solid #eee; }
+        input { flex: 1; padding: 12px 20px; border: 2px solid #ddd; border-radius: 25px; outline: none; font-size: 16px; }
+        input:focus { border-color: #e74c3c; }
+        button#send { background: #e74c3c; color: white; border: none; padding: 0 25px; border-radius: 25px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <img src="https://images.unsplash.com/photo-1543783207-ec64e4d95325?auto=format&fit=crop&w=600&q=80" class="banner" alt="España">
+
+    <div class="card">
         <div class="header">
-            <h2>Profesor de Español AI</h2>
-            <small>Témák: Casa, Deporte, Comida, Tiempo libre</small>
+            <h1>¡Hola! Soy tu profesor de español</h1>
+            <p>Selecciona un tema y empezamos a practicar.</p>
         </div>
+
+        <div class="topics">
+            <button class="topic-btn" onclick="setTopic('la casa', this)">🏠 Nuestra casa</button>
+            <button class="topic-btn" onclick="setTopic('tiempo libre', this)">🎉 Tiempo libre</button>
+            <button class="topic-btn" onclick="setTopic('deportes', this)">⚽ Deportes</button>
+            <button class="topic-btn" onclick="setTopic('comida', this)">🥘 Comida</button>
+        </div>
+
         <div id="chat">
-            <div class="msg teacher">¡Hola! Soy tu profesor de español. ¿De qué quieres hablar hoy?</div>
+            <div class="msg teacher">¡Hola! Elige un tema de arriba para comenzar nuestra clase.</div>
         </div>
+
         <div class="input-area">
-            <input type="text" id="userInput" placeholder="Escribe aquí en español..." onkeypress="if(event.key==='Enter') send()">
-            <button onclick="send()">Enviar</button>
+            <input type="text" id="userInput" placeholder="Escribe tu respuesta..." onkeypress="if(event.key==='Enter') send()">
+            <button id="send" onclick="send()">Enviar</button>
         </div>
     </div>
 
     <script>
-        async function send() {
-            const input = document.getElementById('userInput');
+        let currentTopic = "";
+
+        function setTopic(topic, btn) {
+            currentTopic = topic;
+            document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('active-topic'));
+            btn.classList.add('active-topic');
+            
             const chat = document.getElementById('chat');
-            const text = input.value.trim();
-            if (!text) return;
-
-            // Diák üzenete
-            chat.innerHTML += `<div class="msg student">${text}</div>`;
-            input.value = "";
-            chat.scrollTop = chat.scrollHeight;
-
-            try {
-                // Ez egy ingyenes, nyilvános AI fordító/válaszoló szolgáltatás, amihez nem kell kulcs
-                const response = await fetch('https://api.duckduckgo.com/?q=' + encodeURIComponent("Responde brevemente en español como un profesor a: " + text) + '&format=json');
-                
-                // Mivel a DuckDuckGo API korlátozott, itt egy trükköt alkalmazunk: 
-                // Ha az API nem adna választ, generálunk egy kedves tanári választ mi magunk
-                setTimeout(() => {
-                    const answers = [
-                        "¡Qué interesante! Cuéntame más sobre eso.",
-                        "Muy bien dicho. ¿Te gusta practicar esto a menudo?",
-                        "Entiendo perfectamente. Es un tema muy importante en España.",
-                        "¡Excelente español! ¿Tienes alguna otra duda?",
-                        "Me parece genial. ¿Puedes usar el verbo 'gustar' en tu próxima frase?"
-                    ];
-                    const randomAns = answers[Math.floor(Math.random() * answers.length)];
-                    chat.innerHTML += `<div class="msg teacher">${randomAns}</div>`;
-                    chat.scrollTop = chat.scrollHeight;
-                }, 1000);
-
-            } catch (e) {
-                chat.innerHTML += `<div class="msg teacher">Lo siento, intenta de nuevo en un momento.</div>`;
-            }
+            chat.innerHTML = `<div class="msg teacher">¡Excelente! Vamos a hablar sobre <b>${topic}</b>. ¿Qué me puedes decir de este tema?</div>`;
         }
-    </script>
-</body>
-</html>
+
+        async function send() {
+            const input = document.getElementById
